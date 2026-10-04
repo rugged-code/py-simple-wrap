@@ -554,3 +554,42 @@ def run_update(
             "\n\t- Lowercase letters (a-z)"
             "\n\t- Underscores  (_)."
         ) from None
+def table_exists(
+    connection: sqlite3.Connection,
+    cursor: sqlite3.Cursor,
+    table_name: str,
+) -> bool:
+    """
+    Check whether a table exists in the SQLite database.
+
+    Args:
+        connection (sqlite3.Connection): Open connection to the database.
+        cursor (sqlite3.Cursor): Cursor for executing SQL statements.
+        table_name (str): Name of the table to check.
+
+    Returns:
+        bool: True if the table exists, otherwise False.
+
+    Raises:
+        EasySqlError: If the table name is invalid or checking the
+            table fails.
+    """
+    if not _check_if_valid(table_name):
+        raise EasySqlError(
+            "\n\nERROR: table_name "
+            "can only contain:"
+            "\n\t- Uppercase letters (A-Z)"
+            "\n\t- Lowercase letters (a-z)"
+            "\n\t- Numbers (0-9)"
+            "\n\t- Underscores (_)."
+        ) from None
+
+    try:
+        cursor.execute(
+            "SELECT name FROM sqlite_master "
+            "WHERE type = 'table' AND name = ?",
+            (table_name,),
+        )
+        return cursor.fetchone() is not None
+    except (sqlite3.OperationalError, sqlite3.ProgrammingError) as e:
+        raise EasySqlError(f"\n\nERROR: {e}") from None
