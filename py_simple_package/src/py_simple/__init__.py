@@ -263,6 +263,7 @@ from .easy_sql import (
     run_insert,
     run_select,
     run_update,
+    table_exists,
 )
 from .easy_stats import (
     correlation_coefficient,
